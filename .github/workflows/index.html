@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blemished Lense - CEO Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 5px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .platform-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #e2e8f0;
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+        }
+        
+        .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .youtube { background: #ff0000; }
+        .blog { background: linear-gradient(45deg, #667eea, #764ba2); }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.8s ease;
+            border-radius: 6px;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .content-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-todo { background: #fed7d7; color: #c53030; }
+        .status-progress { background: #fef5e7; color: #dd6b20; }
+        .status-review { background: #e6fffa; color: #319795; }
+        .status-done { background: #d4edda; color: #155724; }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+        
+        .timeline-item {
+            position: relative;
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -22px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .weekly-view {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .day-column {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 200px;
+        }
+        
+        .day-header {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        
+        .task-item {
+            background: white;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🎯 Blemished Lense - CEO Dashboard</h1>
+            <p>Master Control Center for All Content Operations</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="tab-btn" onclick="switchTab('daily')">📅 Daily</button>
+            <button class="tab-btn" onclick="switchTab('weekly')">📋 Weekly</button>
+            <button class="tab-btn" onclick="switchTab('monthly')">🗓️ Monthly</button>
+            <button class="tab-btn" onclick="switchTab('quarterly')">📈 Quarterly</button>
+            <button class="tab-btn" onclick="switchTab('goals')">🎯 Goals</button>
+        </div>
+        
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <div class="overview-grid">
+                <div class="metric-card">
+                    <div class="metric-number">120</div>
+                    <div class="metric-label">Total Monthly Content</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">78%</div>
+                    <div class="metric-label">This Month Progress</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">3</div>
+                    <div class="metric-label">Active Platforms</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">12</div>
+                    <div class="metric-label">Team Members</div>
+                </div>
+            </div>
+            
+            <!-- INSTAGRAM SECTION -->
+            <div class="platform-section">
+                <div class="platform-header">
+                    <div class="platform-icon instagram"></div>
+                    <div>
+                        <h2>Instagram - Blemished Lense</h2>
+                        <p>Target: 28 posts/month | Current: 22/28</p>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 78%;"></div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-item">
+                        <strong>Week 1 (Complete)</strong>
+                        <span class="status-badge status-done">DONE</span>
+                        <div>7 posts delivered on time</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Week 2 (Complete)</strong>
+                        <span class="status-badge status-done">DONE</span>
+                        <div>7 posts delivered on time</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Week 3 (In Progress)</strong>
+                        <span class="status-badge status-progress">IN PROGRESS</span>
+                        <div>5/7 posts completed</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Week 4 (Planned)</strong>
+                        <span class="status-badge status-todo">PLANNED</span>
+                        <div>Content scheduled & ready</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YOUTUBE SECTION -->
+            <div class="platform-section">
+                <div class="platform-header">
+                    <div class="platform-icon youtube"></div>
+                    <div>
+                        <h2>YouTube Channel</h2>
+                        <p>Target: 30 videos/month (15 Long + 15 Shorts) | Current: 23/30</p>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 77%;"></div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-item">
+                        <strong>Long-form Videos</strong>
+                        <span class="status-badge status-progress">12/15</span>
+                        <div>3 videos in editing phase</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>YouTube Shorts</strong>
+                        <span class="status-badge status-progress">11/15</span>
+                        <div>4 shorts ready for upload</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Weekly Batching</strong>
+                        <span class="status-badge status-review">ON TRACK</span>
+                        <div>Monday-Tuesday shoots complete</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BLOG SECTION -->
+            <div class="platform-section">
+                <div class="platform-header">
+                    <div class="platform-icon blog"></div>
+                    <div>
+                        <h2>Blog Content</h2>
+                        <p>Target: 15 articles/month | Current: 12/15</p>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 80%;"></div>
+                </div>
+                <div class="content-grid">
+                    <div class="content-item">
+                        <strong>Inner Archaeology</strong>
+                        <span class="status-badge status-done">7/7</span>
+                        <div>Month 1 theme complete</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Anxiety Alchemy</strong>
+                        <span class="status-badge status-progress">4/5</span>
+                        <div>1 article in review</div>
+                    </div>
+                    <div class="content-item">
+                        <strong>Sacred Pauses</strong>
+                        <span class="status-badge status-todo">1/3</span>
+                        <div>2 articles planned</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DAILY TAB -->
+        <div id="daily" class="tab-content">
+            <h2 style="margin-bottom: 20px;">📅 Today's Action Items - July 24, 2025</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>🎬 YouTube Batch Recording</h3>
+                    <p><strong>Time:</strong> 2:00 PM - 6:00 PM</p>
+                    <p><strong>Task:</strong> Record 2 long-form videos + 2 shorts</p>
+                    <p><strong>Team:</strong> Videographer, You</p>
+                    <button class="action-btn">Mark Complete</button>
+                </div>
+                <div class="timeline-item">
+                    <h3>📱 Instagram Story Series</h3>
+                    <p><strong>Time:</strong> 11:00 AM</p>
+                    <p><strong>Task:</strong> "Rate your mental health today 1-10" interactive post</p>
+                    <p><strong>Team:</strong> Social Media Manager</p>
+                    <button class="action-btn">Review & Approve</button>
+                </div>
+                <div class="timeline-item">
+                    <h3>✍️ Blog Article Review</h3>
+                    <p><strong>Time:</strong> 9:00 AM</p>
+                    <p><strong>Task:</strong> Final review of "How to Sit With Discomfort Without Panicking"</p>
+                    <p><strong>Team:</strong> Content Writer</p>
+                    <button class="action-btn">Publish</button>
+                </div>
+                <div class="timeline-item">
+                    <h3>📊 Weekly Analytics Review</h3>
+                    <p><strong>Time:</strong> 4:00 PM</p>
+                    <p><strong>Task:</strong> Review performance metrics across all platforms</p>
+                    <p><strong>Team:</strong> Analytics Specialist</p>
+                    <button class="action-btn">Schedule Meeting</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- WEEKLY TAB -->
+        <div id="weekly" class="tab-content">
+            <h2 style="margin-bottom: 20px;">📋 This Week's Schedule - July 21-27, 2025</h2>
+            <div class="weekly-view">
+                <div class="day-column">
+                    <div class="day-header">MON</div>
+                    <div class="task-item">📱 IG: Single Post</div>
+                    <div class="task-item">🎥 YT: Long Video Upload</div>
+                    <div class="task-item">📝 Finalize Scripts</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">TUE</div>
+                    <div class="task-item">📱 IG: Reel</div>
+                    <div class="task-item">🎬 YT: Shorts Upload</div>
+                    <div class="task-item">🎥 Batch Recording</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">WED</div>
+                    <div class="task-item">📱 IG: Carousel</div>
+                    <div class="task-item">🎥 YT: Long Video</div>
+                    <div class="task-item">📝 Blog: Publish</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">THU</div>
+                    <div class="task-item">📱 IG: Story Series</div>
+                    <div class="task-item">🎬 YT: Shorts</div>
+                    <div class="task-item">✅ Review Edits</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">FRI</div>
+                    <div class="task-item">📱 IG: Single Post</div>
+                    <div class="task-item">🎥 YT: Long Video</div>
+                    <div class="task-item">📊 Upload & Schedule</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">SAT</div>
+                    <div class="task-item">📱 IG: Reel</div>
+                    <div class="task-item">🎬 YT: Shorts</div>
+                    <div class="task-item">📝 Blog: Review</div>
+                </div>
+                <div class="day-column">
+                    <div class="day-header">SUN</div>
+                    <div class="task-item">📱 IG: Carousel</div>
+                    <div class="task-item">🎥 YT: Long + Short</div>
+                    <div class="task-item">📊 Weekly Review</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MONTHLY TAB -->
+        <div id="monthly" class="tab-content">
+            <h2 style="margin-bottom: 20px;">🗓️ Monthly Overview - July 2025</h2>
+            
+            <div class="platform-section">
+                <h3>📱 Instagram (28 posts total)</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                    <div style="text-align: center; padding: 15px; background: #f0fff4; border-radius: 10px;">
+                        <strong>Week 1</strong><br>
+                        <span style="color: #22c55e;">✅ 7/7 Complete</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f0fff4; border-radius: 10px;">
+                        <strong>Week 2</strong><br>
+                        <span style="color: #22c55e;">✅ 7/7 Complete</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #fffbeb; border-radius: 10px;">
+                        <strong>Week 3</strong><br>
+                        <span style="color: #f59e0b;">⏳ 5/7 In Progress</span>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: #f8fafc; border-radius: 10px;">
+                        <strong>Week 4</strong><br>
+                        <span style="color: #64748b;">📅 0/7 Planned</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="platform-section">
+                <h3>🎥 YouTube (30 videos total)</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="padding: 20px; background: #eff6ff; border-radius: 10px;">
+                        <strong>Long-form Videos (15)</strong><br>
+                        Progress: 12/15 (80%)<br>
+                        <div class="progress-bar" style="margin-top: 10px;">
+                            <div class="progress-fill" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                    <div style="padding: 20px; background: #fef2f2; border-radius: 10px;">
+                        <strong>YouTube Shorts (15)</strong><br>
+                        Progress: 11/15 (73%)<br>
+                        <div class="progress-bar" style="margin-top: 10px;">
+                            <div class="progress-fill" style="width: 73%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="platform-section">
+                <h3>📝 Blog Articles (15 total)</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div style="padding: 15px; background: #f0fdf4; border-radius: 10px;">
+                        <strong>Inner Archaeology</strong><br>
+                        7/7 Complete ✅
+                    </div>
+                    <div style="padding: 15px; background: #fffbeb; border-radius: 10px;">
+                        <strong>Anxiety Alchemy</strong><br>
+                        4/5 In Progress ⏳
+                    </div>
+                    <div style="padding: 15px; background: #f8fafc; border-radius: 10px;">
+                        <strong>Sacred Pauses</strong><br>
+                        1/3 Planned 📅
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- QUARTERLY TAB -->
+        <div id="quarterly" class="tab-content">
+            <h2 style="margin-bottom: 20px;">📈 Q3 2025 Goals & Progress</h2>
+            
+            <div class="overview-grid">
+                <div class="metric-card">
+                    <div class="metric-number">360</div>
+                    <div class="metric-label">Total Q3 Content Target</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">287</div>
+                    <div class="metric-label">Content Completed</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">80%</div>
+                    <div class="metric-label">Quarter Progress</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-number">73</div>
+                    <div class="metric-label">Days Remaining</div>
+                </div>
+            </div>
+            
+            <div class="platform-section">
+                <h3>🎯 3-Month Strategic Breakdown</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px;">
+                        <h4>Month 1: Foundation</h4>
+                        <p>✅ Trust building phase complete</p>
+                        <p>✅ 84 Instagram posts delivered</p>
+                        <p>✅ 45 Blog articles published</p>
+                        <p>✅ 90 YouTube videos live</p>
+                    </div>
+                    <div style="padding: 20px; background: linear-gradient(135deg, #4299e1 0%, #667eea 100%); color: white; border-radius: 15px;">
+                        <h4>Month 2: Growth</h4>
+                        <p>⏳ Product launch executed</p>
+                        <p>⏳ 78/84 Instagram posts (93%)</p>
+                        <p>⏳ 42/45 Blog articles (93%)</p>
+                        <p>⏳ 85/90 YouTube videos (94%)</p>
+                    </div>
+                    <div style="padding: 20px; background: linear-gradient(135deg, #38b2ac 0%, #4299e1 100%); color: white; border-radius: 15px;">
+                        <h4>Month 3: Expansion</h4>
+                        <p>📅 Community building phase</p>
+                        <p>📅 Service promotion planned</p>
+                        <p>📅 Advanced content scheduled</p>
+                        <p>📅 Q4 strategy development</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- GOALS TAB -->
+        <div id="goals" class="tab-content">
+            <h2 style="margin-bottom: 20px;">🎯 Goals & Milestones Tracker</h2>
+            
+            <div class="platform-section">
+                <h3>📊 Key Performance Indicators (KPIs)</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div>
+                        <h4>Content Production Goals</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <strong>Daily: 4 pieces of content</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%;"></div>
+                                </div>
+                                <span>85% average completion rate</span>
+                            </div>
+                            <div class="timeline-item">
+                                <strong>Weekly: 28 pieces of content</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 82%;"></div>
+                                </div>
+                                <span>23/28 this week</span>
+                            </div>
+                            <div class="timeline-item">
+                                <strong>Monthly: 120 pieces of content</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 78%;"></div>
+                                </div>
+                                <span>94/120 this month</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>Quality & Engagement Goals</h4>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <strong>Content Quality Score: 8.5/10</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 85%;"></div>
+                                </div>
+                                <span>Exceeding target of 8.0</span>
+                            </div>
+                            <div class="timeline-item">
+                                <strong>On-time Delivery: 95%</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 95%;"></div>
+                                </div>
+                                <span>Excellent consistency</span>
+                            </div>
+                            <div class="timeline-item">
+                                <strong>Team Efficiency: 88%</strong>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 88%;"></div>
+                                </div>
+                                <span>Good workflow optimization</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="platform-section">
+                <h3>🚀 6-Month Strategic Roadmap</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Q3 2025 (Current) - Content Mastery</h4>
+                        <p>✅ Establish consistent content rhythm across all platforms</p>
+                        <p>⏳ Launch signature products and services</p>
+                        <p>📅 Build engaged community of 50K+ followers</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Q4 2025 - Scale & Optimize</h4>
+                        <p>📅 Expand team with specialized roles</p>
+                        <p>📅 Launch premium content tiers</p>
+                        <p>📅 Develop automated systems for efficiency</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Q1 2026 - Market Leadership</h4>
+                        <p>📅 Establish thought leadership in psychology niche</p>
+                        <p>📅 Launch online courses and workshops</p>
+                        <p>📅 Expand into new platforms and markets</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="platform-section">
+                <h3>⚡ Quick Actions & Priorities</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div>
+                        <h4>🔥 Urgent (Next 24 Hours)</h4>
+                        <div class="content-item" style="background: #fee2e2; border-left-color: #dc2626;">
+                            <strong>YouTube batch recording</strong><br>
+                            <small>2 long-form + 2 shorts due today</small>
+                        </div>
+                        <div class="content-item" style="background: #fee2e2; border-left-color: #dc2626;">
+                            <strong>Instagram carousel approval</strong><br>
+                            <small>Week 3 content needs final review</small>
+                        </div>
+                        <div class="content-item" style="background: #fee2e2; border-left-color: #dc2626;">
+                            <strong>Blog article publication</strong><br>
+                            <small>"Anxiety Alchemy" piece ready to go live</small>
+                        </div>
+                    </div>
+                    <div>
+                        <h4>📋 Important (This Week)</h4>
+                        <div class="content-item" style="background: #fef3c7; border-left-color: #f59e0b;">
+                            <strong>Team performance review</strong><br>
+                            <small>Weekly check-in with all departments</small>
+                        </div>
+                        <div class="content-item" style="background: #fef3c7; border-left-color: #f59e0b;">
+                            <strong>Q4 content planning</strong><br>
+                            <small>Strategic planning session scheduled</small>
+                        </div>
+                        <div class="content-item" style="background: #fef3c7; border-left-color: #f59e0b;">
+                            <strong>Analytics deep dive</strong><br>
+                            <small>Monthly performance analysis due</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons Footer -->
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
+            <button class="action-btn" onclick="exportData()">📊 Export Reports</button>
+            <button class="action-btn" onclick="scheduleTeamMeeting()">👥 Schedule Team Meeting</button>
+            <button class="action-btn" onclick="viewAnalytics()">📈 View Analytics</button>
+            <button class="action-btn" onclick="updateGoals()">🎯 Update Goals</button>
+        </div>
+    </div>
+    
+    <script>
+        // Tab Switching Function
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        // Action Button Functions
+        function exportData() {
+            alert('📊 Exporting comprehensive dashboard data...\n\nThis will include:\n• All platform metrics\n• Team performance data\n• Content completion rates\n• Goal tracking progress');
+        }
+        
+        function scheduleTeamMeeting() {
+            alert('👥 Opening team meeting scheduler...\n\nSuggested agenda:\n• Weekly performance review\n• Content quality assessment\n• Upcoming deadlines\n• Resource allocation');
+        }
+        
+        function viewAnalytics() {
+            alert('📈 Launching analytics dashboard...\n\nAccessing:\n• Platform-specific metrics\n• Engagement rates\n• Content performance\n• ROI tracking');
+        }
+        
+        function updateGoals() {
+            alert('🎯 Opening goal management system...\n\nYou can:\n• Modify KPI targets\n• Add new milestones\n• Track progress\n• Set deadlines');
+        }
+        
+        // Auto-refresh data every 5 minutes
+        setInterval(function() {
+            // In real implementation, this would fetch fresh data
+            console.log('Dashboard data refreshed at:', new Date().toLocaleTimeString());
+        }, 300000);
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Blemished Lense CEO Dashboard initialized');
+            
+            // Simulate real-time updates
+            updateProgressBars();
+        });
+        
+        function updateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        }
+    </script>
+</body>
+</html>
